@@ -1,69 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Short URL</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body {
-            background: linear-gradient(to right, #f9f9f9, #eef1f5);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .title {
-            font-weight: bold;
-            color: #6f42c1;
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 30px;
-        }
-        .card {
-            margin-top: 20px;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-3px);
-        }
-        .form-control {
-            border-radius: 10px;
-        }
-        .btn-primary {
-            border-radius: 10px;
-            background-color: #6f42c1;
-            border-color: #6f42c1;
-        }
-        .btn-outline-primary {
-            border-radius: 10px;
-            color: #6f42c1;
-            border-color: #6f42c1;
-        }
-        .btn-outline-primary:hover {
-            background-color: #6f42c1;
-            color: white;
-        }
-        .feature-icon {
-            font-size: 40px;
-            color: #6f42c1;
-        }
-        .feature-title {
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .feature-desc {
-            color: #555;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Short URL</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+
+  <style>
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to right, #f9f9f9, #eef1f5);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
+
+    .title {
+      font-weight: bold;
+      color: #6f42c1;
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      margin-top: 20px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .form-control, select {
+      border-radius: 10px;
+    }
+
+    .btn-primary {
+      border-radius: 10px;
+      background-color: #6f42c1;
+      border-color: #6f42c1;
+    }
+
+    .btn-outline-primary {
+      border-radius: 10px;
+      color: #6f42c1;
+      border-color: #6f42c1;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: #6f42c1;
+      color: white;
+    }
+
+    .feature-icon {
+      font-size: 40px;
+      color: #6f42c1;
+    }
+
+    .feature-title {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .feature-desc {
+      color: #555;
+    }
+
+    .navbar-light .navbar-nav .nav-link {
+      color: #6f42c1;
+      transition: color 0.3s;
+    }
+
+    .navbar-light .navbar-nav .nav-link:hover {
+      color: #4b2a91;
+      text-decoration: underline;
+    }
+
+    footer {
+      background-color: #f1f1f1;
+      color: #555;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      border-top: 1px solid #ddd;
+    }
+
+    /* Dark Mode Full Page Fix */
+    .dark-mode,
+    .dark-mode html,
+    .dark-mode body {
+      background-color: #121212 !important;
+      color: #eaeaea !important;
+    }
+
+    .dark-mode .card,
+    .dark-mode .navbar,
+    .dark-mode .form-control,
+    .dark-mode select {
+      background-color: #1e1e1e;
+      color: #fff;
+      border-color: #444;
+    }
+
+    .dark-mode .btn-primary,
+    .dark-mode .btn-outline-primary {
+      background-color: #6f42c1;
+      color: #fff;
+      border-color: #6f42c1;
+    }
+
+    .dark-mode .btn-outline-primary:hover {
+      background-color: #4b2a91;
+      border-color: #4b2a91;
+    }
+
+    .dark-mode footer {
+      background-color: #1e1e1e;
+      color: #aaa;
+      border-color: #444;
+    }
+
+    /* Toggle Switch Style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #6f42c1;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+  </style>
 </head>
 <body>
 
-<!-- Toast Notification -->
+<!-- Toast -->
 <div class="toast" style="position: absolute; top: 20px; right: 20px; z-index: 1055;" id="copyToast" role="alert" aria-live="assertive" aria-atomic="true">
   <div class="toast-body bg-success text-white">Short URL copied!</div>
 </div>
@@ -71,135 +186,179 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand text-purple" href="/">🔗 ShortURL</a>
-  <div class="collapse navbar-collapse">
-    <ul class="navbar-nav ml-auto">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto align-items-center">
       <li class="nav-item">
         <a class="nav-link" href="/">🏠 Home</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/history">📁 History</a>
       </li>
+      <li class="nav-item">
+        <label class="switch ml-3">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider"></span>
+        </label>
+      </li>
     </ul>
   </div>
 </nav>
 
+<!-- Main Section -->
 <div class="container">
-    <div class="title">Short URL</div>
+  <div class="title">Short URL</div>
 
-    <!-- URL Input Section -->
-    <div class="card text-center">
-        <h3>Paste the URL to be shortened</h3>
-        <form id="shortenForm" class="mt-3" method="POST" action="/shorten">
-            <div class="form-group row justify-content-center">
-                <div class="col-md-10">
-                    <input type="url" class="form-control" id="longUrl" name="long_url" placeholder="Enter the link here" required autofocus>
-                </div>
-            </div>
-            <div class="form-group row justify-content-center">
-                <div class="col-md-5">
-                    <input type="text" class="form-control" id="customAlias" name="custom_alias" placeholder="Custom alias (optional)">
-                </div>
-                <div class="col-md-5">
-                    <select class="form-control" id="expiration" name="expiration">
-                        <option value="never">Never Expire</option>
-                        <option value="5m">5 Minutes</option>
-                        <option value="1h">1 Hour</option>
-                        <option value="1d">1 Day</option>
-                        <option value="7d">7 Days</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group row justify-content-center">
-                <div class="col-md-10">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password (optional)">
-                </div>
-            </div>
-            <div class="form-row justify-content-center">
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary btn-block" id="shortenBtn">Shorten URL</button>
-                </div>
-            </div>
-        </form>
-
-        <div id="resultSection" class="mt-4" style="display: {{ 'block' if short_url else 'none' }};">
-            <input type="text" class="form-control mb-2" id="shortUrl" value="{{ short_url or '' }}" readonly>
-            <input type="hidden" id="shortUrlInput" value="{{ short_url or '' }}">
-            <button class="btn btn-outline-primary" onclick="copyShortUrl()">Copy</button>
-            <div class="mt-3">
-                {% if short_url %}
-                <a href="/stats/{{ short_url.split('/')[-1] }}" class="btn btn-outline-primary">📊 View Analytics</a>
-                {% endif %}
-            </div>
-            <div class="mt-3">
-                {% if qr_code_filename %}
-                    <img id="qrImage" src="{{ url_for('static', filename=qr_code_filename) }}" alt="QR Code" style="max-width: 150px;">
-                    <br>
-                    <a download="QRCode.png" href="{{ url_for('static', filename=qr_code_filename) }}" class="btn btn-outline-primary mt-2">Download QR</a>
-                {% else %}
-                    <img id="qrImage" style="display:none;">
-                {% endif %}
-            </div>
+  <div class="card text-center">
+    <h3>Paste the URL to be shortened</h3>
+    <form id="shortenForm" class="mt-3" method="POST" action="/shorten">
+      <div class="form-group row justify-content-center">
+        <div class="col-md-10">
+          <input type="url" class="form-control" id="longUrl" name="long_url" placeholder="Enter the link here" required autofocus>
         </div>
+      </div>
+      <div class="form-group row justify-content-center">
+        <div class="col-md-5">
+          <input type="text" class="form-control" id="customAlias" name="custom_alias" placeholder="Custom alias (optional)">
+        </div>
+        <div class="col-md-5">
+          <select class="form-control" id="expiration" name="expiration">
+            <option value="never">Never Expire</option>
+            <option value="5m">5 Minutes</option>
+            <option value="1h">1 Hour</option>
+            <option value="1d">1 Day</option>
+            <option value="7d">7 Days</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row justify-content-center">
+        <div class="col-md-10">
+          <input type="password" class="form-control" id="password" name="password" placeholder="Password (optional)">
+        </div>
+      </div>
+      <div class="form-row justify-content-center">
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary btn-block" id="shortenBtn">Shorten URL</button>
+        </div>
+      </div>
+    </form>
 
-        <p class="mt-3 text-muted">
-            ShortURL is a free tool to shorten URLs and generate smart links.
-            It allows you to create a shortened link that is easy to share.
-        </p>
+    <div id="resultSection" class="mt-4" style="display: {{ 'block' if short_url else 'none' }};">
+      <input type="text" class="form-control mb-2" id="shortUrl" value="{{ short_url or '' }}" readonly>
+      <button class="btn btn-outline-primary" onclick="copyShortUrl()">Copy</button>
+      <div class="mt-3">
+        {% if short_url %}
+        <a href="/stats/{{ short_url.split('/')[-1] }}" class="btn btn-outline-primary">📊 View Analytics</a>
+        {% endif %}
+      </div>
+      <div class="mt-3">
+        {% if qr_code_filename %}
+        <img id="qrImage" src="{{ url_for('static', filename=qr_code_filename) }}" alt="QR Code" style="max-width: 150px;">
+        <br>
+        <a download="QRCode.png" href="{{ url_for('static', filename=qr_code_filename) }}" class="btn btn-outline-primary mt-2">Download QR</a>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- Feature Highlights -->
-    <div class="card">
-        <h4 class="text-center mb-4">Why use our URL Shortener?</h4>
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">⏳</div>
-                <div class="feature-title">Expiry Control</div>
-                <div class="feature-desc">Set a custom expiration time or make links never expire.</div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">🔐</div>
-                <div class="feature-title">Password Protection</div>
-                <div class="feature-desc">Secure your short links with a password.</div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">📷</div>
-                <div class="feature-title">QR Code</div>
-                <div class="feature-desc">Generate and share QR codes for every short URL.</div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">📊</div>
-                <div class="feature-title">Analytics Dashboard</div>
-                <div class="feature-desc">Get insights on visits, devices, locations, and more.</div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">👆</div>
-                <div class="feature-title">Click Tracking</div>
-                <div class="feature-desc">Track how many times your short URL was accessed.</div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">📍</div>
-                <div class="feature-title">IP & Device Logs</div>
-                <div class="feature-desc">See which devices, IPs, and countries accessed your links.</div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">📁</div>
-                <div class="feature-title">URL History</div>
-                <div class="feature-desc">Access a list of all your previously shortened links.</div>
-            </div>
-        </div>
+    <p class="mt-3 text-muted">
+      ShortURL is a free tool to shorten URLs and generate smart links.
+      It allows you to create a shortened link that is easy to share.
+    </p>
+  </div>
+
+  <!-- Features -->
+  <div class="card">
+    <h4 class="text-center mb-4">Why use our URL Shortener?</h4>
+    <div class="row text-center">
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">⏳</div>
+        <div class="feature-title">Expiry Control</div>
+        <div class="feature-desc">Set a custom expiration time or make links never expire.</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">🔐</div>
+        <div class="feature-title">Password Protection</div>
+        <div class="feature-desc">Secure your short links with a password.</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">📷</div>
+        <div class="feature-title">QR Code</div>
+        <div class="feature-desc">Generate and share QR codes for every short URL.</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Analytics Dashboard</div>
+        <div class="feature-desc">Get insights on visits, devices, locations, and more.</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">👆</div>
+        <div class="feature-title">Click Tracking</div>
+        <div class="feature-desc">Track how many times your short URL was accessed.</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">📍</div>
+        <div class="feature-title">IP & Device Logs</div>
+        <div class="feature-desc">See which devices, IPs, and countries accessed your links.</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="feature-icon">📁</div>
+        <div class="feature-title">URL History</div>
+        <div class="feature-desc">Access a list of all your previously shortened links.</div>
+      </div>
     </div>
+  </div>
 </div>
 
+<!-- Footer -->
+<footer>
+  &copy; 2025 ShortURL | Made by Pranav
+</footer>
+
+<!-- Scripts -->
 <script>
-    function copyShortUrl() {
-        const shortUrlField = document.getElementById('shortUrl');
-        shortUrlField.select();
-        shortUrlField.setSelectionRange(0, 99999);
-        document.execCommand('copy');
-        const toast = new bootstrap.Toast(document.getElementById('copyToast'));
-        toast.show();
+  function copyShortUrl() {
+    const shortUrlField = document.getElementById('shortUrl');
+    shortUrlField.select();
+    shortUrlField.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+    toast.show();
+  }
+
+  function applyDarkMode(enabled) {
+    if (enabled) {
+      document.body.classList.add('dark-mode');
+      document.documentElement.classList.add('dark-mode');
+      document.getElementById('darkModeToggle').checked = true;
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.documentElement.classList.remove('dark-mode');
+      document.getElementById('darkModeToggle').checked = false;
     }
+  }
+
+  document.getElementById('darkModeToggle').addEventListener('change', function () {
+    const enabled = this.checked;
+    localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
+    applyDarkMode(enabled);
+  });
+
+  window.onload = function () {
+    const preference = localStorage.getItem('darkMode');
+    if (preference === 'enabled') {
+      applyDarkMode(true);
+    } else if (!preference && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      applyDarkMode(true);
+    } else {
+      applyDarkMode(false);
+    }
+  }
 </script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
