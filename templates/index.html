@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -94,11 +94,10 @@
       border-top: 1px solid #ddd;
     }
 
-    /* Dark Mode Full Page Fix */
-    .dark-mode,
-    .dark-mode html,
-    .dark-mode body {
-      background-color: #121212 !important;
+    /* Dark Mode Fix */
+    .dark-mode body,
+    .dark-mode html {
+      background: #121212 !important;
       color: #eaeaea !important;
     }
 
@@ -106,30 +105,30 @@
     .dark-mode .navbar,
     .dark-mode .form-control,
     .dark-mode select {
-      background-color: #1e1e1e;
-      color: #fff;
-      border-color: #444;
+      background-color: #1e1e1e !important;
+      color: #fff !important;
+      border-color: #444 !important;
     }
 
     .dark-mode .btn-primary,
     .dark-mode .btn-outline-primary {
-      background-color: #6f42c1;
-      color: #fff;
-      border-color: #6f42c1;
+      background-color: #6f42c1 !important;
+      color: #fff !important;
+      border-color: #6f42c1 !important;
     }
 
     .dark-mode .btn-outline-primary:hover {
-      background-color: #4b2a91;
-      border-color: #4b2a91;
+      background-color: #4b2a91 !important;
+      border-color: #4b2a91 !important;
     }
 
     .dark-mode footer {
-      background-color: #1e1e1e;
-      color: #aaa;
-      border-color: #444;
+      background-color: #1e1e1e !important;
+      color: #aaa !important;
+      border-color: #444 !important;
     }
 
-    /* Toggle Switch Style */
+    /* Toggle Switch */
     .switch {
       position: relative;
       display: inline-block;
@@ -207,7 +206,7 @@
   </div>
 </nav>
 
-<!-- Main Section -->
+<!-- Main Content -->
 <div class="container">
   <div class="title">Short URL</div>
 
@@ -245,21 +244,9 @@
       </div>
     </form>
 
-    <div id="resultSection" class="mt-4" style="display: {{ 'block' if short_url else 'none' }};">
-      <input type="text" class="form-control mb-2" id="shortUrl" value="{{ short_url or '' }}" readonly>
+    <div id="resultSection" class="mt-4" style="display: none;">
+      <input type="text" class="form-control mb-2" id="shortUrl" value="" readonly>
       <button class="btn btn-outline-primary" onclick="copyShortUrl()">Copy</button>
-      <div class="mt-3">
-        {% if short_url %}
-        <a href="/stats/{{ short_url.split('/')[-1] }}" class="btn btn-outline-primary">📊 View Analytics</a>
-        {% endif %}
-      </div>
-      <div class="mt-3">
-        {% if qr_code_filename %}
-        <img id="qrImage" src="{{ url_for('static', filename=qr_code_filename) }}" alt="QR Code" style="max-width: 150px;">
-        <br>
-        <a download="QRCode.png" href="{{ url_for('static', filename=qr_code_filename) }}" class="btn btn-outline-primary mt-2">Download QR</a>
-        {% endif %}
-      </div>
     </div>
 
     <p class="mt-3 text-muted">
@@ -268,55 +255,54 @@
     </p>
   </div>
 
-  <!-- Features -->
   <div class="card">
-    <h4 class="text-center mb-4">Why use our URL Shortener?</h4>
-    <div class="row text-center">
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">⏳</div>
-        <div class="feature-title">Expiry Control</div>
-        <div class="feature-desc">Set a custom expiration time or make links never expire.</div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">🔐</div>
-        <div class="feature-title">Password Protection</div>
-        <div class="feature-desc">Secure your short links with a password.</div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">📷</div>
-        <div class="feature-title">QR Code</div>
-        <div class="feature-desc">Generate and share QR codes for every short URL.</div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">📊</div>
-        <div class="feature-title">Analytics Dashboard</div>
-        <div class="feature-desc">Get insights on visits, devices, locations, and more.</div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">👆</div>
-        <div class="feature-title">Click Tracking</div>
-        <div class="feature-desc">Track how many times your short URL was accessed.</div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">📍</div>
-        <div class="feature-title">IP & Device Logs</div>
-        <div class="feature-desc">See which devices, IPs, and countries accessed your links.</div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="feature-icon">📁</div>
-        <div class="feature-title">URL History</div>
-        <div class="feature-desc">Access a list of all your previously shortened links.</div>
-      </div>
+  <h4 class="text-center mb-4">Why use our URL Shortener?</h4>
+  <div class="row text-center">
+    <div class="col-md-4 mb-4">
+      <div class="feature-icon">⏳</div>
+      <div class="feature-title">Expiry Control</div>
+      <div class="feature-desc">Set a custom expiration time or make links never expire.</div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-icon">🔐</div>
+      <div class="feature-title">Password Protection</div>
+      <div class="feature-desc">Secure your short links with a password.</div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-icon">📷</div>
+      <div class="feature-title">QR Code</div>
+      <div class="feature-desc">Generate and share QR codes for every short URL.</div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Analytics Dashboard</div>
+      <div class="feature-desc">Get insights on visits, devices, locations, and more.</div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-icon">👆</div>
+      <div class="feature-title">Click Tracking</div>
+      <div class="feature-desc">Track how many times your short URL was accessed.</div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="feature-icon">📍</div>
+      <div class="feature-title">Regional Access Logs</div>
+      <div class="feature-desc">Know which countries and regions your short URLs are getting accessed from.</div>
+    </div>
+    <div class="col-md-4 mb-4 mx-auto">
+      <div class="feature-icon">📁</div>
+      <div class="feature-title">URL History</div>
+      <div class="feature-desc">Access a list of all your previously shortened links.</div>
     </div>
   </div>
 </div>
 
+
 <!-- Footer -->
 <footer>
-  &copy; 2025 ShortURL | Made by Pranav
+  &copy; 2025 ShortURL | Made by Pranav, Aditya and Avika
 </footer>
 
-<!-- Scripts -->
+<!-- JS Scripts -->
 <script>
   function copyShortUrl() {
     const shortUrlField = document.getElementById('shortUrl');
@@ -347,14 +333,12 @@
 
   window.onload = function () {
     const preference = localStorage.getItem('darkMode');
-    if (preference === 'enabled') {
-      applyDarkMode(true);
-    } else if (!preference && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (preference === 'enabled' || (!preference && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       applyDarkMode(true);
     } else {
       applyDarkMode(false);
     }
-  }
+  };
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
