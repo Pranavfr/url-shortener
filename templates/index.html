@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Short URL</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 
   <style>
     html, body {
@@ -40,8 +41,32 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
+    .glass-card {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(200,200,255,0.2);
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+    }
+
     .form-control, select {
       border-radius: 10px;
+    }
+
+    .btn-primary, .btn-outline-primary {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(111,66,193,0.10);
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover, .btn-outline-primary:hover {
+      box-shadow: 0 4px 16px rgba(111,66,193,0.18);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .form-control:focus {
+      border-color: #6f42c1;
+      box-shadow: 0 0 0 2px rgba(111,66,193,0.15);
     }
 
     .btn-primary {
@@ -198,20 +223,20 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg" id="mainNavbar">
-  <a class="navbar-brand" href="/">🔗 ShortURL</a>
+  <a class="navbar-brand" href="/"><i class="fa-solid fa-link"></i> ShortURL</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto align-items-center">
       <li class="nav-item">
-        <a class="nav-link" href="/">🏠 Home</a>
+        <a class="nav-link" href="/"><i class="fa-solid fa-house"></i> Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/history">📁 History</a>
+        <a class="nav-link" href="/history"><i class="fa-solid fa-folder-open"></i> History</a>
       </li>
       <li class="nav-item">
-        <label class="switch ml-3">
+        <label class="switch ml-3" title="Toggle dark mode">
           <input type="checkbox" id="darkModeToggle">
           <span class="slider"></span>
         </label>
@@ -282,41 +307,41 @@
   </div>
 
   <!-- Features -->
-  <div class="card">
+  <div class="card glass-card">
     <h4 class="text-center mb-4">Why use our URL Shortener?</h4>
     <div class="row text-center">
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">⏳</div>
+        <div class="feature-icon"><i class="fa-regular fa-clock"></i></div>
         <div class="feature-title">Expiry Control</div>
         <div class="feature-desc">Set a custom expiration time or make links never expire.</div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">🔐</div>
+        <div class="feature-icon"><i class="fa-solid fa-lock"></i></div>
         <div class="feature-title">Password Protection</div>
         <div class="feature-desc">Secure your short links with a password.</div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">📷</div>
+        <div class="feature-icon"><i class="fa-solid fa-qrcode"></i></div>
         <div class="feature-title">QR Code</div>
         <div class="feature-desc">Generate and share QR codes for every short URL.</div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">📊</div>
+        <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
         <div class="feature-title">Analytics Dashboard</div>
         <div class="feature-desc">Get insights on visits, devices, locations, and more.</div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">👆</div>
+        <div class="feature-icon"><i class="fa-solid fa-mouse-pointer"></i></div>
         <div class="feature-title">Click Tracking</div>
         <div class="feature-desc">Track how many times your short URL was accessed.</div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">📍</div>
+        <div class="feature-icon"><i class="fa-solid fa-location-dot"></i></div>
         <div class="feature-title">IP & Device Logs</div>
         <div class="feature-desc">See which devices, IPs, and countries accessed your links.</div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="feature-icon">📁</div>
+        <div class="feature-icon"><i class="fa-solid fa-list"></i></div>
         <div class="feature-title">URL History</div>
         <div class="feature-desc">Access a list of all your previously shortened links.</div>
       </div>
