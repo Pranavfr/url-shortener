@@ -11,7 +11,6 @@ ANALYTICS_FILE = 'analytics.json'
 QR_DIR = 'static/qrcodes'
 os.makedirs(QR_DIR, exist_ok=True)
 
-# ✅ Set your admin IPs (public IPs if deployed)
 ADMIN_IPS = ['127.0.0.1']  # Update with your real admin IP if hosted
 
 # Load or initialize storage
@@ -49,16 +48,19 @@ def get_expiration_seconds(option):
     }
     return mapping.get(option, None)
 
+def get_client_ip():
+    return request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+
 def get_location(ip):
     try:
-        res = requests.get(f"http://ipinfo.io/{ip}/json")
-        data = res.json()
-        return data.get("region", "Unknown"), data.get("country", "Unknown")
-    except:
+        response = requests.get(f"http://ip-api.com/json/{ip}")
+        data = response.json()
+        region = data.get("regionName", "Unknown")
+        country = data.get("country", "Unknown")
+        return region, country
+    except Exception as e:
+        print(f"[ERROR] Location fetch failed for IP {ip}: {e}")
         return "Unknown", "Unknown"
-
-def get_client_ip():
-    return request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
 
 @app.route('/')
 def index():
@@ -76,7 +78,6 @@ def shorten():
     created_at = time.time()
     expire_at = None if expire_option == 'never' else created_at + get_expiration_seconds(expire_option)
 
-    # Track session-based user
     user_id = session.get('user_id')
     if not user_id:
         user_id = str(time.time()) + get_client_ip()
@@ -100,7 +101,6 @@ def shorten():
 
     json.dump(url_map, open(URL_FILE, 'w'))
 
-    # Generate QR code
     short_url = request.host_url + short
     qr_img = qrcode.make(short_url)
     qr_path = os.path.join(QR_DIR, f"{short}.png")
@@ -117,7 +117,6 @@ def redirect_to_original(short):
     if entry['expire_at'] and time.time() > entry['expire_at']:
         return "⏰ Link Expired!", 410
 
-    # Handle password protection
     if entry.get('password'):
         if request.method == 'GET':
             return render_template("password_prompt.html", short=short)
@@ -125,11 +124,9 @@ def redirect_to_original(short):
         if user_pass != entry['password']:
             return render_template("password_prompt.html", short=short, error="❌ Incorrect password")
 
-    # Count click
     entry['clicks'] += 1
     json.dump(url_map, open(URL_FILE, 'w'))
 
-    # IP & location tracking
     ip = get_client_ip()
     region, country = get_location(ip)
 
