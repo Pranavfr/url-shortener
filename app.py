@@ -1,15 +1,18 @@
-from flask import Flask, request, redirect, render_template, send_from_directory
+from flask import Flask, request, redirect, render_template, send_from_directory, session
 import hashlib, json, os, time, qrcode
 from datetime import datetime
 import requests
-from collections import defaultdict
 
 app = Flask(__name__)
+app.secret_key = 'your-very-secure-secret'  # Replace this for production
 
 URL_FILE = 'urls.json'
 ANALYTICS_FILE = 'analytics.json'
 QR_DIR = 'static/qrcodes'
 os.makedirs(QR_DIR, exist_ok=True)
+
+# ✅ Set your admin IPs (public IPs if deployed)
+ADMIN_IPS = ['127.0.0.1']  # Update with your real admin IP if hosted
 
 # Load or initialize storage
 url_map = json.load(open(URL_FILE)) if os.path.exists(URL_FILE) else {}
@@ -54,6 +57,9 @@ def get_location(ip):
     except:
         return "Unknown", "Unknown"
 
+def get_client_ip():
+    return request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -70,6 +76,12 @@ def shorten():
     created_at = time.time()
     expire_at = None if expire_option == 'never' else created_at + get_expiration_seconds(expire_option)
 
+    # Track session-based user
+    user_id = session.get('user_id')
+    if not user_id:
+        user_id = str(time.time()) + get_client_ip()
+        session['user_id'] = user_id
+
     if custom_alias:
         if custom_alias in url_map and url_map[custom_alias]['original_url'] != long_url:
             return "❌ Custom alias already in use!", 400
@@ -82,7 +94,8 @@ def shorten():
         "created_at": created_at,
         "expire_at": expire_at,
         "clicks": 0,
-        "password": password if password else None
+        "password": password if password else None,
+        "user_id": user_id
     }
 
     json.dump(url_map, open(URL_FILE, 'w'))
@@ -116,15 +129,16 @@ def redirect_to_original(short):
     entry['clicks'] += 1
     json.dump(url_map, open(URL_FILE, 'w'))
 
-    # Location tracking
-    ip = request.remote_addr
+    # IP & location tracking
+    ip = get_client_ip()
     region, country = get_location(ip)
 
     click_info = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "region": region,
         "country": country,
-        "user_agent": request.headers.get('User-Agent')
+        "user_agent": request.headers.get('User-Agent'),
+        "ip": ip
     }
 
     analytics.setdefault(short, []).append(click_info)
@@ -134,7 +148,15 @@ def redirect_to_original(short):
 
 @app.route('/history')
 def history():
-    return render_template("history.html", urls=url_map)
+    user_id = session.get('user_id')
+    client_ip = get_client_ip()
+
+    if client_ip in ADMIN_IPS:
+        visible_urls = url_map
+    else:
+        visible_urls = {k: v for k, v in url_map.items() if v.get('user_id') == user_id}
+
+    return render_template("history.html", urls=visible_urls)
 
 @app.route('/stats/<short>')
 def stats(short):
