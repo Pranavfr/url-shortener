@@ -3,47 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <title>Analytics for {{ short }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <style>
-        table {
-            width: 100%;
-            margin-top: 20px;
-            word-break: break-word;
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
         }
-        h2 {
-            margin-top: 30px;
+        body {
+            background: linear-gradient(to right, #f9f9f9, #eef1f5);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        .card {
+            margin-top: 20px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(200,200,255,0.2);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+        }
+        .title {
+            font-weight: bold;
+            color: #6f42c1;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .btn-primary, .btn-outline-primary {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(111,66,193,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            border-radius: 10px;
+        }
+        .btn-primary:hover, .btn-outline-primary:hover {
+            box-shadow: 0 4px 16px rgba(111,66,193,0.18);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .table thead th {
+            background-color: #6f42c1;
+            color: #fff;
+            border: none;
+        }
+        .table tbody tr {
+            background-color: rgba(255,255,255,0.95);
+        }
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        .back-link {
+            color: #6f42c1;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #4b2a91;
+            text-decoration: underline;
+        }
+        footer {
+            background-color: #f1f1f1;
+            color: #555;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            border-top: 1px solid #ddd;
+        }
+        /* Dark mode styles */
+        html.dark-mode, body.dark-mode {
+            background-color: #121212 !important;
+            background-image: none !important;
+            color: #eaeaea !important;
+        }
+        .dark-mode .glass-card,
+        .dark-mode .table,
+        .dark-mode .form-control {
+            background-color: #1e1e1e;
+            color: #fff;
+            border-color: #444;
+        }
+        .dark-mode .table,
+        .dark-mode .table th,
+        .dark-mode .table td {
+            color: #eaeaea !important;
+        }
+        .dark-mode .table thead th {
+            background-color: #4b2a91;
+            color: #fff;
+        }
+        .dark-mode .btn-primary,
+        .dark-mode .btn-outline-primary {
+            background-color: #6f42c1;
+            color: #fff;
+            border-color: #6f42c1;
+        }
+        .dark-mode .btn-outline-primary:hover {
+            background-color: #4b2a91;
+            border-color: #4b2a91;
+        }
+        .dark-mode footer {
+            background-color: #1e1e1e;
+            color: #aaa;
+            border-color: #444;
+        }
+        .dark-mode .table tbody tr,
+        .dark-mode .table-bordered tbody tr {
+            background-color: #181818 !important;
+            color: #eaeaea !important;
+        }
+        .dark-mode .table-hover tbody tr:hover {
+            background-color: #232323 !important;
+            color: #fff !important;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📊 Analytics for <code>{{ short }}</code></h1>
-        <p><a href="/">🔗 Go Back</a></p>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg" id="mainNavbar">
+      <a class="navbar-brand" href="/"><i class="fa-solid fa-link"></i> ShortURL</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fa-solid fa-house"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/history"><i class="fa-solid fa-folder-open"></i> History</a>
+          </li>
+          <li class="nav-item">
+            <label class="switch ml-3" title="Toggle dark mode">
+              <input type="checkbox" id="darkModeToggle">
+              <span class="slider"></span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </nav>
 
-        {% if logs %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Region</th>
-                    <th>Country</th>
-                    <th>User Agent</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in logs %}
-                <tr>
-                    <td>{{ log.timestamp }}</td>
-                    <td>{{ log.region }}</td>
-                    <td>{{ log.country }}</td>
-                    <td>{{ log.user_agent }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No analytics data available for this URL.</p>
-        {% endif %}
+    <div class="container">
+        <div class="title"><i class="fa-solid fa-chart-line"></i> Analytics for <code>{{ short }}</code></div>
+        <p>
+            <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Go Back</a>
+        </p>
+        <div class="card glass-card">
+            {% if logs %}
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-regular fa-clock"></i> Timestamp</th>
+                            <th><i class="fa-solid fa-globe"></i> Region</th>
+                            <th><i class="fa-solid fa-flag"></i> Country</th>
+                            <th><i class="fa-solid fa-desktop"></i> User Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.timestamp }}</td>
+                            <td>{{ log.region }}</td>
+                            <td>{{ log.country }}</td>
+                            <td>{{ log.user_agent }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted mb-0">No analytics data available for this URL.</p>
+            {% endif %}
+        </div>
     </div>
+
+    <footer>
+      &copy; 2025 ShortURL | Made by Pranav, Aditya and Avika
+    </footer>
+
+    <!-- Dark mode toggle script (same as index.html) -->
+    <script>
+      function applyDarkMode(enabled) {
+        if (enabled) {
+          document.body.classList.add('dark-mode');
+          document.documentElement.classList.add('dark-mode');
+          document.getElementById('darkModeToggle').checked = true;
+        } else {
+          document.body.classList.remove('dark-mode');
+          document.documentElement.classList.remove('dark-mode');
+          document.getElementById('darkModeToggle').checked = false;
+        }
+      }
+      document.getElementById('darkModeToggle').addEventListener('change', function () {
+        const enabled = this.checked;
+        localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
+        applyDarkMode(enabled);
+      });
+      window.onload = function () {
+        const preference = localStorage.getItem('darkMode');
+        if (preference === 'enabled') {
+          applyDarkMode(true);
+        } else if (!preference && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          applyDarkMode(true);
+        } else {
+          applyDarkMode(false);
+        }
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

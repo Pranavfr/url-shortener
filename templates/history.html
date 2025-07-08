@@ -3,38 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <title>URL History</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <style>
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(to right, #f9f9f9, #eef1f5);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(200,200,255,0.2);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+            border-radius: 16px;
+            padding: 32px 24px;
+        }
+        .title {
+            font-weight: bold;
+            color: #6f42c1;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        .table thead th {
+            background-color: #6f42c1;
+            color: #fff;
+            border: none;
+            font-size: 1.1rem;
+            vertical-align: middle !important;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+        .table tbody tr {
+            background-color: rgba(255,255,255,0.95);
+            transition: background 0.2s;
+        }
+        .table tbody tr:hover {
+            background-color: #f3eaff;
+        }
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0;
+            box-shadow: 0 2px 12px rgba(111,66,193,0.07);
+        }
+        .btn-primary, .btn-outline-primary, .btn-secondary {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(111,66,193,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .btn-primary:hover, .btn-outline-primary:hover, .btn-secondary:hover {
+            box-shadow: 0 4px 16px rgba(111,66,193,0.18);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .btn-primary {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+        }
+        .btn-outline-primary {
+            color: #6f42c1;
+            border-color: #6f42c1;
+            background: transparent;
+        }
+        .btn-outline-primary:hover {
+            background-color: #6f42c1;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #f3eaff;
+            color: #6f42c1;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background: #6f42c1;
+            color: #fff;
+        }
+        .fa-arrow-left {
+            margin-right: 6px;
+        }
+        .fa-chart-line {
+            margin-right: 4px;
+        }
+        .fa-link {
+            margin-right: 8px;
+        }
+        /* Dark mode styles */
+        html.dark-mode, body.dark-mode {
+            background-color: #121212 !important;
+            background-image: none !important;
+            color: #eaeaea !important;
+        }
+        .dark-mode .glass-card,
+        .dark-mode .table,
+        .dark-mode .form-control {
+            background-color: #1e1e1e;
+            color: #fff;
+            border-color: #444;
+        }
+        .dark-mode .table thead th {
+            background-color: #4b2a91;
+            color: #fff;
+        }
+        .dark-mode .table tbody tr,
+        .dark-mode .table-bordered tbody tr {
+            background-color: #181818 !important;
+            color: #eaeaea !important;
+        }
+        .dark-mode .table-hover tbody tr:hover {
+            background-color: #232323 !important;
+            color: #fff !important;
+        }
+        .dark-mode .btn-primary,
+        .dark-mode .btn-outline-primary {
+            background-color: #6f42c1;
+            color: #fff;
+            border-color: #6f42c1;
+        }
+        .dark-mode .btn-outline-primary:hover {
+            background-color: #4b2a91;
+            border-color: #4b2a91;
+        }
+        .dark-mode .btn-secondary {
+            background: #232323;
+            color: #eaeaea;
+        }
+        .dark-mode .btn-secondary:hover {
+            background: #6f42c1;
+            color: #fff;
+        }
+        .dark-mode a {
+            color: #bbaaff;
+        }
+        .dark-mode a:hover {
+            color: #fff;
+        }
+        /* Toggle Switch Style */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #6f42c1;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">🔗 URL History</h2>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-        <tr>
-            <th>Short Code</th>
-            <th>Original URL</th>
-            <th>Created At</th>
-            <th>Expires At</th>
-            <th>Clicks</th>
-            <th>Analytics</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for short, data in urls.items() %}
-            <tr>
-                <td>{{ short }}</td>
-                <td><a href="{{ data.original_url }}" target="_blank">{{ data.original_url }}</a></td>
-                <td>{{ data.created_at | default(0) | datetimeformat }}</td>
-                <td>{{ data.expire_at | default(None) | datetimeformat }}</td>
-                <td>{{ data.clicks | default(0) }}</td>
-                <td><a href="/stats/{{ short }}" class="btn btn-sm btn-primary">View Stats</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <div class="text-center mt-4">
-        <a href="/" class="btn btn-secondary">← Back to Home</a>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg" id="mainNavbar">
+      <a class="navbar-brand" href="/"><i class="fa-solid fa-link"></i> ShortURL</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fa-solid fa-house"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <label class="switch ml-3" title="Toggle dark mode">
+              <input type="checkbox" id="darkModeToggle">
+              <span class="slider"></span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+        <div class="glass-card">
+            <div class="title"><i class="fa-solid fa-clock-rotate-left"></i> URL History</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-code mr-2" style="font-size:1.1em;"></i>
+                                    <span>Short Code</span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-link mr-2" style="font-size:1.1em;"></i>
+                                    <span>Original URL</span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-calendar-plus mr-2" style="font-size:1.1em;"></i>
+                                    <span>Created At</span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-calendar-xmark mr-2" style="font-size:1.1em;"></i>
+                                    <span>Expires At</span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-mouse-pointer mr-2" style="font-size:1.1em;"></i>
+                                    <span>Clicks</span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="d-flex align-items-center">
+                                    <i class="fa-solid fa-chart-line mr-2" style="font-size:1.1em;"></i>
+                                    <span>Analytics</span>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for short, data in urls.items() %}
+                        <tr>
+                            <td>{{ short }}</td>
+                            <td>
+                                <a href="{{ data.original_url }}" target="_blank" title="Open original URL">
+                                    {{ data.original_url }}
+                                    <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                                </a>
+                            </td>
+                            <td>{{ data.created_at | default(0) | datetimeformat }}</td>
+                            <td>{{ data.expire_at | default(None) | datetimeformat }}</td>
+                            <td>{{ data.clicks | default(0) }}</td>
+                            <td>
+                                <a href="/stats/{{ short }}" class="btn btn-sm btn-outline-primary" title="View Analytics">
+                                    <i class="fa-solid fa-chart-line"></i> Stats
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+        </div>
     </div>
-</div>
+
+    <footer class="mt-5 text-center" style="border-top:1px solid #eee; padding:16px 0; color:#888;">
+        &copy; 2025 ShortURL | Made by Pranav, Aditya and Avika
+    </footer>
+
+    <!-- Dark mode toggle script -->
+    <script>
+      function applyDarkMode(enabled) {
+        if (enabled) {
+          document.body.classList.add('dark-mode');
+          document.documentElement.classList.add('dark-mode');
+          document.getElementById('darkModeToggle').checked = true;
+        } else {
+          document.body.classList.remove('dark-mode');
+          document.documentElement.classList.remove('dark-mode');
+          document.getElementById('darkModeToggle').checked = false;
+        }
+      }
+      document.getElementById('darkModeToggle').addEventListener('change', function () {
+        const enabled = this.checked;
+        localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
+        applyDarkMode(enabled);
+      });
+      window.onload = function () {
+        const preference = localStorage.getItem('darkMode');
+        if (preference === 'enabled') {
+          applyDarkMode(true);
+        } else if (!preference && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          applyDarkMode(true);
+        } else {
+          applyDarkMode(false);
+        }
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
