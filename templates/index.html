@@ -15,9 +15,30 @@
     }
 
     body {
-      background: linear-gradient(to right, #f9f9f9, #eef1f5);
+      /* Animated, vibrant gradient */
+      background: linear-gradient(120deg, #f9f9f9, #e0c3fc, #8ec5fc, #f093fb, #f5576c);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
       transition: background-color 0.3s, color 0.3s;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    /* Dark mode gradient */
+    html.dark-mode body,
+    body.dark-mode {
+      background: linear-gradient(120deg, #232526, #414345, #6f42c1, #232526, #232526);
+      background-size: 400% 400%;
+      animation: gradientBG 18s ease infinite;
+      color: #eaeaea !important;
     }
 
     .container {
@@ -212,6 +233,46 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
+
+    .navbar {
+      border-radius: 0 !important;
+      overflow: visible !important;
+    }
+
+    .navbar-toggler {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border-radius: 8px;
+      border: 2px solid #6f42c1;
+      background: #fff;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .navbar-toggler:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #bbaaff;
+      background: #f3eaff;
+    }
+
+    .dark-mode .navbar-toggler {
+      background: #232323;
+      border-color: #bbaaff;
+    }
+
+    .dark-mode .navbar-toggler:focus {
+      background: #444;
+      box-shadow: 0 0 0 2px #6f42c1;
+    }
+
+    /* Remove custom sizing from the icon */
+    .navbar-toggler-icon {
+      width: 1.5em;
+      height: 1.5em;
+      min-width: unset;
+      min-height: unset;
+    }
   </style>
 </head>
 <body>
@@ -222,9 +283,9 @@
 </div>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg" id="mainNavbar">
+<nav class="navbar navbar-expand-lg navbar-light bg-white" id="mainNavbar">
   <a class="navbar-brand" href="/"><i class="fa-solid fa-link"></i> ShortURL</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
