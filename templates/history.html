@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>URL History</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">🔗 URL History</h2>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Short Code</th>
+            <th>Original URL</th>
+            <th>Created At</th>
+            <th>Expires At</th>
+            <th>Clicks</th>
+            <th>Analytics</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for short, data in urls.items() %}
+            <tr>
+                <td>{{ short }}</td>
+                <td><a href="{{ data.original_url }}" target="_blank">{{ data.original_url }}</a></td>
+                <td>{{ data.created_at | default(0) | datetimeformat }}</td>
+                <td>{{ data.expire_at | default(None) | datetimeformat }}</td>
+                <td>{{ data.clicks | default(0) }}</td>
+                <td><a href="/stats/{{ short }}" class="btn btn-sm btn-primary">View Stats</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-secondary">← Back to Home</a>
+    </div>
+</div>
+</body>
+</html>

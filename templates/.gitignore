@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+instance/
+urls.json
+analytics.json
+*.sqlite3
+.DS_Store

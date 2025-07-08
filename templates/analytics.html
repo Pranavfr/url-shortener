@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics for {{ short }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+    <style>
+        table {
+            width: 100%;
+            margin-top: 20px;
+            word-break: break-word;
+        }
+        h2 {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Analytics for <code>{{ short }}</code></h1>
+        <p><a href="/">🔗 Go Back</a></p>
+
+        {% if logs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Region</th>
+                    <th>Country</th>
+                    <th>User Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp }}</td>
+                    <td>{{ log.region }}</td>
+                    <td>{{ log.country }}</td>
+                    <td>{{ log.user_agent }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No analytics data available for this URL.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
