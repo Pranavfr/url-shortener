@@ -1,13 +1,16 @@
-from flask import Flask, request, redirect, render_template, send_from_directory, session
+from flask import Flask, request, redirect, render_template, send_from_directory, session, url_for
 import hashlib, json, os, time, qrcode
 from datetime import datetime
 import requests
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = 'your-very-secure-secret'  # Replace this for production
 
 URL_FILE = 'urls.json'
 ANALYTICS_FILE = 'analytics.json'
+USERS_FILE = 'users.json'
 QR_DIR = 'static/qrcodes'
 os.makedirs(QR_DIR, exist_ok=True)
 
@@ -16,6 +19,7 @@ ADMIN_IPS = ['127.0.0.1']  # Update with your real admin IP if hosted
 # Load or initialize storage
 url_map = json.load(open(URL_FILE)) if os.path.exists(URL_FILE) else {}
 analytics = json.load(open(ANALYTICS_FILE)) if os.path.exists(ANALYTICS_FILE) else {}
+users = json.load(open(USERS_FILE)) if os.path.exists(USERS_FILE) else {}
 
 BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -78,10 +82,13 @@ def shorten():
     created_at = time.time()
     expire_at = None if expire_option == 'never' else created_at + get_expiration_seconds(expire_option)
 
-    user_id = session.get('user_id')
-    if not user_id:
-        user_id = str(time.time()) + get_client_ip()
-        session['user_id'] = user_id
+    if current_user.is_authenticated:
+        user_id = current_user.id
+    else:
+        user_id = session.get('user_id')
+        if not user_id:
+            user_id = str(time.time()) + get_client_ip()
+            session['user_id'] = user_id
 
     if custom_alias:
         if custom_alias in url_map and url_map[custom_alias]['original_url'] != long_url:
@@ -144,16 +151,10 @@ def redirect_to_original(short):
     return redirect(entry['original_url'])
 
 @app.route('/history')
+@login_required
 def history():
-    user_id = session.get('user_id')
-    client_ip = get_client_ip()
-
-    if client_ip in ADMIN_IPS:
-        visible_urls = url_map
-    else:
-        visible_urls = {k: v for k, v in url_map.items() if v.get('user_id') == user_id}
-
-    return render_template("history.html", urls=visible_urls)
+    user_urls = {k: v for k, v in url_map.items() if v.get('user_id') == current_user.id}
+    return render_template("history.html", urls=user_urls)
 
 @app.route('/stats/<short>')
 def stats(short):
@@ -171,6 +172,89 @@ def datetimeformat(value):
     if value is None:
         return "Never"
     return datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M:%S')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id in users:
+        return User(user_id)
+    return None
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password']
+        if username in users:
+            return render_template('register.html', error="Username already exists.")
+        users[username] = generate_password_hash(password)
+        json.dump(users, open(USERS_FILE, 'w'))
+        return redirect('/login')
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password']
+        if username in users and check_password_hash(users[username], password):
+            login_user(User(username))
+            return redirect('/dashboard')
+        return render_template('login.html', error="Invalid credentials.")
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    user_urls = {k: v for k, v in url_map.items() if v.get('user_id') == current_user.id}
+    # Example: Collect click data for each link for the chart
+    analytics = {}
+    for short, data in user_urls.items():
+        clicks = []
+        if 'analytics' in data:
+            for entry in data['analytics']:
+                # entry: {'timestamp': ..., ...}
+                date = datetime.fromtimestamp(entry['timestamp']).strftime('%Y-%m-%d')
+                clicks.append(date)
+        analytics[short] = clicks
+    return render_template("dashboard.html", urls=user_urls, analytics=analytics)
+
+@app.route('/analytics/<short>')
+@login_required
+def analytics_view(short):
+    if short not in url_map:
+        return "❌ Invalid URL code", 404
+    # Always reload analytics from file to get latest data
+    analytics_data = json.load(open(ANALYTICS_FILE)) if os.path.exists(ANALYTICS_FILE) else {}
+    logs = analytics_data.get(short, [])
+    return render_template("analytics.html", short=short, logs=logs)
+
+@app.route('/analytics')
+@login_required
+def analytics_overview():
+    # Redirect to the analytics page for the first short link
+    user_urls = {k: v for k, v in url_map.items() if v['owner'] == current_user.id}
+    if user_urls:
+        first_short = next(iter(user_urls))
+        return redirect(url_for('analytics_view', short=first_short))
+    return "No links found!", 404
 
 if __name__ == '__main__':
     app.run(debug=True)

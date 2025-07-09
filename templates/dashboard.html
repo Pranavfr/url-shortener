@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: #e0e7ff;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 28px;
+            box-shadow: 0 8px 40px 0 rgba(31,38,135,0.13);
+            padding: 32px 24px 32px 24px;
+            max-width: 1200px;
+            margin: 48px auto 32px auto;
+        }
+        .dashboard-title {
+            font-weight: bold;
+            color: #6f42c1;
+            text-align: center;
+            font-size: 2.7rem;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        .table thead th {
+            background: #6f42c1;
+            color: #fff;
+            border: none;
+            font-size: 1.1rem;
+            vertical-align: middle;
+        }
+        .table tbody tr {
+            background: #f7f7fa;
+            font-size: 1.05rem;
+        }
+        .table tbody tr:hover {
+            background: #e0e7ff;
+        }
+        .table th, .table td {
+            vertical-align: middle !important;
+        }
+        .rounded-table {
+            border-radius: 18px;
+            overflow: hidden;
+        }
+        .profile-card {
+            background: #f3eaff;
+            border-radius: 16px;
+            padding: 18px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #6f42c1;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 32px;
+            right: 48px;
+            background: #f3eaff;
+            color: #6f42c1;
+            border-radius: 12px;
+            border: none;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+        }
+        .logout-btn:hover {
+            background: #6f42c1;
+            color: #fff;
+        }
+        .navbar {
+            background: transparent !important;
+            border: none;
+            box-shadow: none;
+        }
+        .navbar .nav-link {
+            color: #6f42c1 !important;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        .navbar .nav-link.active, .navbar .nav-link:focus, .navbar .nav-link:hover {
+            color: #fff !important;
+            background: #6f42c1 !important;
+            border-radius: 8px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        /* --- DARK MODE --- */
+        html.dark-mode body, body.dark-mode {
+            background: #181828 !important;
+            color: #eaeaea !important;
+        }
+        html.dark-mode .main-card, body.dark-mode .main-card {
+            background: #232334 !important;
+            color: #eaeaea !important;
+        }
+        html.dark-mode .dashboard-title, body.dark-mode .dashboard-title {
+            color: #bbaaff !important;
+        }
+        html.dark-mode .table thead th, body.dark-mode .table thead th {
+            background: #6f42c1 !important;
+            color: #fff !important;
+        }
+        html.dark-mode .table tbody tr, body.dark-mode .table tbody tr {
+            background: #181828 !important;
+            color: #eaeaea !important;
+        }
+        html.dark-mode .table tbody tr:hover, body.dark-mode .table tbody tr:hover {
+            background: #232334 !important;
+        }
+        html.dark-mode .profile-card, body.dark-mode .profile-card {
+            background: #2d2346 !important;
+            color: #bbaaff !important;
+        }
+        html.dark-mode .profile-avatar, body.dark-mode .profile-avatar {
+            background: #6f42c1 !important;
+            color: #fff !important;
+        }
+        html.dark-mode .logout-btn, body.dark-mode .logout-btn {
+            background: #232334 !important;
+            color: #bbaaff !important;
+        }
+        html.dark-mode .logout-btn:hover, body.dark-mode .logout-btn:hover {
+            background: #6f42c1 !important;
+            color: #fff !important;
+        }
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 44px;
+          height: 24px;
+          margin-bottom: 0;
+        }
+        .switch input {display:none;}
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background-color: #ccc;
+          transition: .4s;
+          border-radius: 24px;
+        }
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 18px;
+          width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+        }
+        input:checked + .slider {
+          background-color: #6f42c1;
+        }
+        input:checked + .slider:before {
+          transform: translateX(20px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg mb-4">
+      <a class="navbar-brand font-weight-bold" href="/"><i class="fa-solid fa-link"></i> ShortURL</a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fa fa-home"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/history"><i class="fa fa-clock-rotate-left"></i> History</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/dashboard"><i class="fa fa-gauge"></i> Dashboard</a>
+          </li>
+          <!-- Dark mode toggle switch -->
+          <li class="nav-item d-flex align-items-center ml-3">
+            <label class="switch mb-0">
+              <input type="checkbox" id="darkModeToggle">
+              <span class="slider round"></span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="main-card position-relative">
+        <button class="logout-btn" onclick="window.location.href='/logout'"><i class="fa fa-sign-out-alt"></i> Logout</button>
+        <div class="dashboard-title"><i class="fa-solid fa-gauge"></i> Dashboard</div>
+        <div class="profile-card">
+            <div class="profile-avatar">{{ current_user.id[0]|upper }}</div>
+            <div>
+                <div class="font-weight-bold" style="font-size:1.2rem;">{{ current_user.id }}</div>
+                <div style="font-size:0.95rem;">Total Links: {{ urls|length }} | Total Clicks: {{ urls.values()|map(attribute='clicks')|sum }}</div>
+            </div>
+        </div>
+        <div class="table-responsive rounded-table">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th><i class="fa fa-link"></i> Short Code</th>
+                        <th><i class="fa fa-link"></i> Original URL</th>
+                        <th><i class="fa fa-chart-line"></i> Clicks</th>
+                        <th><i class="fa fa-qrcode"></i> QR</th>
+                        <th><i class="fa fa-trash"></i> Delete</th>
+                        <th><i class="fa fa-calendar-plus"></i> Created</th>
+                        <th><i class="fa fa-chart-line"></i> Analytics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for short, data in urls.items() %}
+                    <tr>
+                        <td>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" value="{{ request.url_root ~ short }}" readonly id="short-{{ loop.index }}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-primary btn-sm" type="button" onclick="copyToClipboard('short-{{ loop.index }}')">
+                                        <i class="fa fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ data.original_url }}" target="_blank">
+                                {{ data.original_url }}
+                                <i class="fa fa-external-link-alt ml-1"></i>
+                            </a>
+                        </td>
+                        <td>{{ data.clicks | default(0) }}</td>
+                        <td>
+                            {% if data.qr_code_filename %}
+                            <a href="{{ url_for('static', filename=data.qr_code_filename) }}" target="_blank">
+                                <img src="{{ url_for('static', filename=data.qr_code_filename) }}" alt="QR" style="width:40px;">
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ short }}')">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                        <td>
+                          {{ data.created_at | datetimeformat if data.created_at else 'N/A' }}
+                        </td>
+                        <td>
+                          <a href="/analytics/{{ short }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fa fa-chart-line"></i> Stats
+                          </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-5">
+            <h5 class="text-center mb-4"><i class="fa-solid fa-chart-line"></i> Clicks Over Time</h5>
+            <canvas id="clicksChart"></canvas>
+        </div>
+    </div>
+    <script>
+        // Chart.js for Clicks Over Time
+        const analytics = {{ analytics|tojson }};
+        let dateCounts = {};
+        Object.values(analytics).forEach(clicks => {
+            clicks.forEach(date => {
+                dateCounts[date] = (dateCounts[date] || 0) + 1;
+            });
+        });
+        const labels = Object.keys(dateCounts).sort();
+        const data = labels.map(date => dateCounts[date]);
+        const ctx = document.getElementById('clicksChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Clicks',
+                    data: data,
+                    borderColor: '#6f42c1',
+                    backgroundColor: 'rgba(111,66,193,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#6f42c1'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Date' } },
+                    y: { title: { display: true, text: 'Clicks' }, beginAtZero: true }
+                }
+            }
+        });
+
+        function copyToClipboard(id) {
+            var copyText = document.getElementById(id);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert("Copied: " + copyText.value);
+        }
+
+        function confirmDelete(short) {
+            if (confirm("Are you sure you want to delete this link?")) {
+                window.location.href = "/delete/" + short;
+            }
+        }
+
+        // Dark mode toggle logic
+        const toggle = document.getElementById('darkModeToggle');
+        // Set initial state based on localStorage or system preference
+        if (
+          localStorage.getItem('darkMode') === 'on' ||
+          (localStorage.getItem('darkMode') === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ) {
+          document.documentElement.classList.add('dark-mode');
+          toggle.checked = true;
+        }
+        toggle.addEventListener('change', function() {
+          if (this.checked) {
+            document.documentElement.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'on');
+          } else {
+            document.documentElement.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'off');
+          }
+        });
+    </script>
+</body>
+</html>

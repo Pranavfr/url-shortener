@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f7f7fa 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.93);
+            backdrop-filter: blur(14px);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+            padding: 36px 28px 28px 28px;
+            max-width: 370px;
+            width: 100%;
+            margin: 32px 0;
+            border: 1.5px solid rgba(200,200,255,0.18);
+        }
+        .title {
+            font-weight: bold;
+            color: #6f42c1;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .form-control:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 2px rgba(111,66,193,0.15);
+        }
+        .btn-primary {
+            border-radius: 10px;
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(111,66,193,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #4b2a91;
+            border-color: #4b2a91;
+            box-shadow: 0 4px 16px rgba(111,66,193,0.18);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .fa-right-to-bracket {
+            color: #6f42c1;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: block;
+            text-align: center;
+        }
+        .footer-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #fff;
+            background: linear-gradient(90deg, #6f42c1 0%, #8ec5fc 100%);
+            border-radius: 8px;
+            padding: 8px 0;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            box-shadow: 0 2px 8px rgba(111,66,193,0.10);
+        }
+        .footer-link:hover {
+            background: linear-gradient(90deg, #8ec5fc 0%, #6f42c1 100%);
+            color: #fff;
+            text-decoration: none;
+        }
+        @media (max-width: 500px) {
+            .glass-card {
+                padding: 18px 6px 18px 6px;
+            }
+            .title {
+                font-size: 1.3rem;
+            }
+        }
+        /* --- DARK MODE --- */
+        html.dark-mode body, body.dark-mode {
+            background: linear-gradient(135deg, #181828 0%, #232526 100%) !important;
+            color: #eaeaea !important;
+        }
+        html.dark-mode .glass-card, body.dark-mode .glass-card {
+            background: rgba(30, 30, 40, 0.97) !important;
+            border-color: #222 !important;
+            color: #eaeaea !important;
+        }
+        html.dark-mode .title, body.dark-mode .title {
+            color: #bbaaff !important;
+        }
+        html.dark-mode .form-control, body.dark-mode .form-control {
+            background: #232334 !important;
+            color: #eaeaea !important;
+            border: 1px solid #444 !important;
+        }
+        html.dark-mode .form-control:focus, body.dark-mode .form-control:focus {
+            background: #232334 !important;
+            color: #fff !important;
+            border-color: #6f42c1 !important;
+            box-shadow: 0 0 0 2px #6f42c1;
+        }
+        html.dark-mode .btn-primary, body.dark-mode .btn-primary {
+            background: #6f42c1 !important;
+            color: #fff !important;
+            border-color: #6f42c1 !important;
+        }
+        html.dark-mode .footer-link, body.dark-mode .footer-link {
+            background: linear-gradient(90deg, #6f42c1 0%, #232334 100%) !important;
+            color: #bbaaff !important;
+        }
+        html.dark-mode .footer-link:hover, body.dark-mode .footer-link:hover {
+            background: linear-gradient(90deg, #232334 0%, #6f42c1 100%) !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+<div class="glass-card">
+    <i class="fa-solid fa-right-to-bracket"></i>
+    <div class="title">Login to Your Account</div>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    <form method="POST" autocomplete="off">
+        <input class="form-control mb-2" name="username" placeholder="Username" required autofocus>
+        <input class="form-control mb-2" name="password" type="password" placeholder="Password" required>
+        <button class="btn btn-primary btn-block mt-3"><i class="fa-solid fa-right-to-bracket mr-2"></i>Login</button>
+    </form>
+    <a href="/register" class="footer-link">Don't have an account? <b>Register</b></a>
+</div>
+</body>
+</html>

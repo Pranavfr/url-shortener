@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>404 Not Found</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <style>
+    body {
+      background: linear-gradient(120deg, #f093fb, #f5576c, #8ec5fc);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    .glass-card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.13);
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .glass-card h1 {
+      font-size: 5rem;
+      color: #f5576c;
+      font-weight: bold;
+    }
+    .glass-card p {
+      font-size: 1.3rem;
+      color: #6f42c1;
+    }
+    .btn-primary {
+      margin-top: 24px;
+      border-radius: 10px;
+      background-color: #6f42c1;
+      border-color: #6f42c1;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(111,66,193,0.10);
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      background-color: #4b2a91;
+      border-color: #4b2a91;
+      box-shadow: 0 4px 16px rgba(111,66,193,0.18);
+      transform: translateY(-2px) scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-card">
+    <h1><i class="fa-solid fa-triangle-exclamation"></i> 404</h1>
+    <p>Oops! The page you are looking for does not exist.</p>
+    <a href="/" class="btn btn-primary"><i class="fa-solid fa-house"></i> Go Home</a>
+  </div>
+</body>
+</html>
