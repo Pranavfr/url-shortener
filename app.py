@@ -5,21 +5,24 @@ import requests
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Import database models
+from models import db, URL, User as UserModel, Analytics
+from database_utils import migrate_json_to_database, backup_json_files
+
 app = Flask(__name__)
 app.secret_key = 'your-very-secure-secret'  # Replace this for production
 
-URL_FILE = 'urls.json'
-ANALYTICS_FILE = 'analytics.json'
-USERS_FILE = 'users.json'
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///url_shortener.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+db.init_app(app)
+
 QR_DIR = 'static/qrcodes'
 os.makedirs(QR_DIR, exist_ok=True)
 
 ADMIN_IPS = ['127.0.0.1']  # Update with your real admin IP if hosted
-
-# Load or initialize storage
-url_map = json.load(open(URL_FILE)) if os.path.exists(URL_FILE) else {}
-analytics = json.load(open(ANALYTICS_FILE)) if os.path.exists(ANALYTICS_FILE) else {}
-users = json.load(open(USERS_FILE)) if os.path.exists(USERS_FILE) else {}
 
 BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -38,7 +41,10 @@ def hash_url(long_url):
         raw = long_url + str(salt)
         hashed = hashlib.sha256(raw.encode()).hexdigest()
         short = base62_encode(int(hashed, 16))[:6]
-        if short not in url_map or url_map[short]['original_url'] == long_url:
+        
+        # Check if short code exists in database
+        existing_url = URL.query.filter_by(short_code=short).first()
+        if not existing_url or existing_url.original_url == long_url:
             return short
         salt += 1
 
@@ -91,22 +97,35 @@ def shorten():
             session['user_id'] = user_id
 
     if custom_alias:
-        if custom_alias in url_map and url_map[custom_alias]['original_url'] != long_url:
+        existing_url = URL.query.filter_by(short_code=custom_alias).first()
+        if existing_url and existing_url.original_url != long_url:
             return "❌ Custom alias already in use!", 400
         short = custom_alias
     else:
         short = hash_url(long_url)
 
-    url_map[short] = {
-        "original_url": long_url,
-        "created_at": created_at,
-        "expire_at": expire_at,
-        "clicks": 0,
-        "password": password if password else None,
-        "user_id": user_id
-    }
+    # Check if URL already exists, if so update it
+    existing_url = URL.query.filter_by(short_code=short).first()
+    if existing_url:
+        existing_url.original_url = long_url
+        existing_url.created_at = created_at
+        existing_url.expire_at = expire_at
+        existing_url.password = password if password else None
+        existing_url.user_id = user_id
+    else:
+        # Create new URL entry
+        new_url = URL(
+            short_code=short,
+            original_url=long_url,
+            created_at=created_at,
+            expire_at=expire_at,
+            clicks=0,
+            password=password if password else None,
+            user_id=user_id
+        )
+        db.session.add(new_url)
 
-    json.dump(url_map, open(URL_FILE, 'w'))
+    db.session.commit()
 
     short_url = request.host_url + short
     qr_img = qrcode.make(short_url)
@@ -117,51 +136,57 @@ def shorten():
 
 @app.route('/<short>', methods=['GET', 'POST'])
 def redirect_to_original(short):
-    entry = url_map.get(short)
-    if not entry:
+    url_entry = URL.query.filter_by(short_code=short).first()
+    if not url_entry:
         return "❌ Short URL not found!", 404
 
-    if entry['expire_at'] and time.time() > entry['expire_at']:
+    if url_entry.expire_at and time.time() > url_entry.expire_at:
         return "⏰ Link Expired!", 410
 
-    if entry.get('password'):
+    if url_entry.password:
         if request.method == 'GET':
             return render_template("password_prompt.html", short=short)
         user_pass = request.form.get('password', '')
-        if user_pass != entry['password']:
+        if user_pass != url_entry.password:
             return render_template("password_prompt.html", short=short, error="❌ Incorrect password")
 
-    entry['clicks'] += 1
-    json.dump(url_map, open(URL_FILE, 'w'))
+    # Increment clicks
+    url_entry.clicks += 1
+    db.session.commit()
 
+    # Log analytics
     ip = get_client_ip()
     region, country = get_location(ip)
 
-    click_info = {
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "region": region,
-        "country": country,
-        "user_agent": request.headers.get('User-Agent'),
-        "ip": ip
-    }
+    analytics = Analytics(
+        short_code=short,
+        timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        ip=ip,
+        region=region,
+        country=country,
+        user_agent=request.headers.get('User-Agent')
+    )
+    db.session.add(analytics)
+    db.session.commit()
 
-    analytics.setdefault(short, []).append(click_info)
-    json.dump(analytics, open(ANALYTICS_FILE, 'w'))
-
-    return redirect(entry['original_url'])
+    return redirect(url_entry.original_url)
 
 @app.route('/history')
 @login_required
 def history():
-    user_urls = {k: v for k, v in url_map.items() if v.get('user_id') == current_user.id}
-    return render_template("history.html", urls=user_urls)
+    user_urls = URL.query.filter_by(user_id=current_user.id).all()
+    urls_dict = {url.short_code: url.to_dict() for url in user_urls}
+    return render_template("history.html", urls=urls_dict)
 
 @app.route('/stats/<short>')
 def stats(short):
-    if short not in url_map:
+    url_entry = URL.query.filter_by(short_code=short).first()
+    if not url_entry:
         return "❌ Invalid URL code", 404
-    clicks = analytics.get(short, [])
-    return render_template("analytics.html", short=short, logs=clicks)
+    
+    analytics_logs = Analytics.query.filter_by(short_code=short).all()
+    logs = [log.to_dict() for log in analytics_logs]
+    return render_template("analytics.html", short=short, logs=logs)
 
 @app.route('/chart.js')
 def serve_chart():
@@ -187,7 +212,8 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    if user_id in users:
+    user = UserModel.query.filter_by(username=user_id).first()
+    if user:
         return User(user_id)
     return None
 
@@ -196,10 +222,18 @@ def register():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password']
-        if username in users:
+        
+        existing_user = UserModel.query.filter_by(username=username).first()
+        if existing_user:
             return render_template('register.html', error="Username already exists.")
-        users[username] = generate_password_hash(password)
-        json.dump(users, open(USERS_FILE, 'w'))
+        
+        new_user = UserModel(
+            username=username,
+            password_hash=generate_password_hash(password)
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        
         return redirect('/login')
     return render_template('register.html')
 
@@ -208,7 +242,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password']
-        if username in users and check_password_hash(users[username], password):
+        
+        user = UserModel.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password):
             login_user(User(username))
             return redirect('/dashboard')
         return render_template('login.html', error="Invalid credentials.")
@@ -223,38 +259,68 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user_urls = {k: v for k, v in url_map.items() if v.get('user_id') == current_user.id}
-    # Example: Collect click data for each link for the chart
-    analytics = {}
-    for short, data in user_urls.items():
+    user_urls = URL.query.filter_by(user_id=current_user.id).all()
+    urls_dict = {url.short_code: url.to_dict() for url in user_urls}
+    
+    # Collect analytics data for chart
+    analytics_data = {}
+    for url in user_urls:
+        analytics_logs = Analytics.query.filter_by(short_code=url.short_code).all()
         clicks = []
-        if 'analytics' in data:
-            for entry in data['analytics']:
-                # entry: {'timestamp': ..., ...}
-                date = datetime.fromtimestamp(entry['timestamp']).strftime('%Y-%m-%d')
-                clicks.append(date)
-        analytics[short] = clicks
-    return render_template("dashboard.html", urls=user_urls, analytics=analytics)
+        for log in analytics_logs:
+            try:
+                # Parse timestamp and format as date
+                log_date = datetime.strptime(log.timestamp, "%Y-%m-%d %H:%M:%S").strftime('%Y-%m-%d')
+                clicks.append(log_date)
+            except:
+                # Fallback for different timestamp formats
+                clicks.append(log.timestamp.split(' ')[0] if ' ' in log.timestamp else log.timestamp)
+        analytics_data[url.short_code] = clicks
+    
+    return render_template("dashboard.html", urls=urls_dict, analytics=analytics_data)
 
 @app.route('/analytics/<short>')
 @login_required
 def analytics_view(short):
-    if short not in url_map:
+    url_entry = URL.query.filter_by(short_code=short).first()
+    if not url_entry:
         return "❌ Invalid URL code", 404
-    # Always reload analytics from file to get latest data
-    analytics_data = json.load(open(ANALYTICS_FILE)) if os.path.exists(ANALYTICS_FILE) else {}
-    logs = analytics_data.get(short, [])
+    
+    analytics_logs = Analytics.query.filter_by(short_code=short).all()
+    logs = [log.to_dict() for log in analytics_logs]
     return render_template("analytics.html", short=short, logs=logs)
 
 @app.route('/analytics')
 @login_required
 def analytics_overview():
-    # Redirect to the analytics page for the first short link
-    user_urls = {k: v for k, v in url_map.items() if v['owner'] == current_user.id}
+    user_urls = URL.query.filter_by(user_id=current_user.id).first()
     if user_urls:
-        first_short = next(iter(user_urls))
-        return redirect(url_for('analytics_view', short=first_short))
+        return redirect(url_for('analytics_view', short=user_urls.short_code))
     return "No links found!", 404
+
+@app.route('/migrate')
+def migrate_data():
+    """Manual migration endpoint - remove this in production"""
+    try:
+        backup_dir = backup_json_files()
+        migrate_json_to_database()
+        return f"Migration completed! Backup created in {backup_dir}"
+    except Exception as e:
+        return f"Migration failed: {e}", 500
+
+# Initialize database and migrate existing data
+with app.app_context():
+    db.create_all()
+    
+    # Check if we need to migrate existing JSON data
+    if (os.path.exists('urls.json') or os.path.exists('users.json') or os.path.exists('analytics.json')):
+        print("Found existing JSON files. Starting migration...")
+        try:
+            backup_dir = backup_json_files()
+            migrate_json_to_database()
+            print(f"Migration completed! Backup created in {backup_dir}")
+        except Exception as e:
+            print(f"Migration failed: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True)
