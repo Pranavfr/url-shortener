@@ -4,5 +4,5 @@ services:
     env: python
     plan: free
     buildCommand: "python3.11 -m pip install -r requirements.txt"
-    startCommand: "python3.11 -m gunicorn app:app"
-    runtime: python3.11
+    startCommand: "python3 -m gunicorn app:app"
+    runtime: python3
