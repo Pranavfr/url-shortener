@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = 'your-very-secure-secret'  # Replace this for production
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///url_shortener.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///url_shortener.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
@@ -261,9 +261,9 @@ def logout():
 def dashboard():
     user_urls = URL.query.filter_by(user_id=current_user.id).all()
     urls_dict = {url.short_code: url.to_dict() for url in user_urls}
-    
     # Collect analytics data for chart
     analytics_data = {}
+    total_clicks = 0
     for url in user_urls:
         analytics_logs = Analytics.query.filter_by(short_code=url.short_code).all()
         clicks = []
@@ -276,8 +276,8 @@ def dashboard():
                 # Fallback for different timestamp formats
                 clicks.append(log.timestamp.split(' ')[0] if ' ' in log.timestamp else log.timestamp)
         analytics_data[url.short_code] = clicks
-    
-    return render_template("dashboard.html", urls=urls_dict, analytics=analytics_data)
+        total_clicks += url.clicks or 0
+    return render_template("dashboard.html", urls=urls_dict, analytics=analytics_data, total_clicks=total_clicks)
 
 @app.route('/analytics/<short>')
 @login_required
